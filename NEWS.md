@@ -9,9 +9,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added AMR-related methods `mark` and `estimate` to `Adaptivity` module. Implemented Dorfler marking strategy. Since PR[#1063](https://github.com/gridap/Gridap.jl/pull/1063).
+
+## [0.18.8] - 2024-12-2
+
+### Added
+
+- Added get_dof_value_type for FESpacesWithLinearConstraints. Since PR[#1062](https://github.com/gridap/Gridap.jl/pull/1062).
+- Added Xiao-Gimbutas quadratures for simplices. Since PR[#1058](https://github.com/gridap/Gridap.jl/pull/1058).
+- Small improvements of the documentation of `Gridap.TensorValues`. Since PR[#1051](https://github.com/gridap/Gridap.jl/pull/1051).
+
+### Fixed
+
+- Fixed #974, an error when weak form is real but unknown vector is complex. Since PR[#1050](https://github.com/gridap/Gridap.jl/pull/1050).
+- Fixed issue where barycentric refinement rule in 3D would not produce oriented meshes. Since PR[#1055](https://github.com/gridap/Gridap.jl/pull/1055).
+
+### Changed
+- Optimized MonomialBasis low-level functions. Since PR[#1059](https://github.com/gridap/Gridap.jl/pull/1059).
+
+## [0.18.7] - 2024-10-8
+
+### Added
+
 - Added MacroFElements. These are defined as having the basis/dof-basis of a FESpace created on top of a RefinementRule. Since PR[#1024](https://github.com/gridap/Gridap.jl/pull/1024).
 - Added Barycentric refinement rule in 2D and 3D. Added Simplexify refinement rule. Since PR[#1024](https://github.com/gridap/Gridap.jl/pull/1024).
 - Added names to vector and tensor components in VTK exports, to avoid Paraview's automatic (sometimes wrong) guesses. See `TensorValues.indep_components_names`. Since PR[#1038](https://github.com/gridap/Gridap.jl/pull/1038).
+- Misc improvements of the `TensorValues` module:  See `TensorValues.indep_components_names`. Since PR[#1040](https://github.com/gridap/Gridap.jl/pull/1040).
+  - Documented all symbols exported by the module
+  - Improved and added test for some API function of `MultiValue` (general `diag` of 2nd order tensors, fixed `convert` of 3rd order tensors to SArray, avoid unwanted fallback of `num_components` on `MultiValue` types with undefined dimensions, more autodiff tests, better `double_contraction` API (prevent invalid operation giving indexing errors and enable valid operations)).
+  - Added a clear separation between the physical components access (`getindex`, `num_components`) and the numerical access to the stored independent components (`num_indep_components`, `indep_comp_getindex`) to enable using symmetric tensor types as unknown in FE Spaces.
+  - Implemented automatic differentiation `gradient` and `laplacian` for second order tensor, and `divergence` for third order tensors.
+  - Added `AbstractSymTensorValue`, an abstract type for second order symmetric tensors, and `SymTracelessTensorValue` (aliased to `QTensorValue`), a type for traceless symmetric tensors. `SymTensorValue` is now subtype of `AbstractSymTensorValue`.
+  - A convergence test for Poisson problem of `QTensorValue` unknown field validates the implementation.
+- Added support for benchmarking, through `PkgBenchmark.jl`. Since PR[#1039](https://github.com/gridap/Gridap.jl/pull/1039).
+- Added code quality tests, through `Aqua.jl`. Since PR[#1039](https://github.com/gridap/Gridap.jl/pull/1039).
+
+### Fixed
+
+- Fixed constructor of RungeKutta with only one solver. Since PR[#999](https://github.com/gridap/Gridap.jl/pull/999).
+
+### Changed
+
+- Conforming FESpaces now keep track of their `CellConformity` info, within the `metadata` field. Since PR[#1042](https://github.com/gridap/Gridap.jl/pull/1042).
 
 ## [0.18.6] - 2024-08-29
 
