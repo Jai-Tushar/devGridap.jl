@@ -166,47 +166,67 @@ function get_extension(m::FaceMeasure{Df,Dc}) where {Df,Dc}
   return ConstantField(TensorValue(hcat([vs[2]-vs[1]...],[vs[3]-vs[1]...])))
 end
 
-# TO DO: Bug in 3D, when n==2; n==4 and D==3. Also, working on this to make better and more general.
-function get_facet_measure(p::Polytope{D}, face::Int) where D
+function get_facet_measure(p::Polytope{2}, face::Int) 
   measures = Float64[]
-  facet_entities = get_face_coordinates(p)
-  for entity in facet_entities   
-    n = length(entity)
-    if n == 1 
-       push!(measures, 0.0)  # A point has zero measure
-    elseif n == 2
-        # Length of an edge
-        p1, p2 = entity
-        push!(measures, norm(p2-p1))
-    elseif n == 3 && D == 2
-      # Perimeter of the closed polygon
-      n = length(entity)
-      perimeter = 0.0
-      for i in 1:n
-          p1, p2 = entity[i], entity[mod1(i+1, n)]  # cyclic indices
-          perimeter += norm([p2[1] - p1[1], p2[2] - p1[2]])
-      end
-      push!(measures, perimeter)
-    elseif n == 3 && D == 3
-      # Area of a simplex 
-      p1, p2, p3 = entity
-      v1 = [p2[i] - p1[i] for i in 1:D]
-      v2 = [p3[i] - p1[i] for i in 1:D]
-      area = 0.5 * norm(cross(v1, v2))
-      push!(measures, area)
-    elseif n == 4 && D == 3
-      # Volume of a tetrahedron ( To do: Should be perimeter of the tetrahedron.)
-      p1, p2, p3, p4 = entity
-      v1 = [p2[i] - p1[i] for i in 1:D]
-      v2 = [p3[i] - p1[i] for i in 1:D]
-      v3 = [p4[i] - p1[i] for i in 1:D]
-      volume = abs(dot(v1, cross(v2, v3))) / 6
-      push!(measures, volume)
-    end
-
+  if p == QUAD 
+      perm = [1,2,4,3]
+  elseif p == TRI
+      perm = [1,2,3]
   end
   dim = get_dimranges(p)[face+1]
-  return measures[dim]
+  if face == 0
+      face_ents = get_face_coordinates(p)[dim]
+      for entity in face_ents
+          push!(measures, 0.0)
+      end
+  elseif face == 1
+      face_ents = get_face_coordinates(p)[dim]
+      for entity in face_ents
+          p1, p2 = entity
+          push!(measures, norm(p2-p1))
+      end
+  elseif face == 2
+      # Shoelace / Gauss area algo
+      face_ents = get_face_coordinates(p)[dim]
+      face_ents = map(Reindex(face_ents...),perm)
+      shift = circshift(face_ents, -1) 
+      sum1 = map(face_ents, shift) do x1, x2
+          x1[1] * x2[2]  
+      end
+      sum2 = map(face_ents, shift) do x1, x2
+          x1[2] * x2[1]  
+      end
+      area = 0.5 * abs(sum(sum1)-sum(sum2))
+      push!(measures, area)
+  end
+  return measures
+end
+
+function get_face_measure(p::Polytope{3}, face::Int) 
+  measures = Float64[]
+  dim = get_dimranges(p)[face+1]
+  if face == 0
+      face_ents = get_face_coordinates(p)[dim]
+      for entity in face_ents
+          push!(measures, 0.0)
+      end
+  elseif face == 1
+      face_ents = get_face_coordinates(p)[dim]
+      for entity in face_ents
+          p1, p2 = entity
+          push!(measures, norm(p2-p1))
+      end
+  elseif face == 2
+      if p == HEX 
+          perm = [1,2,4,3]
+      elseif p == TET
+          perm = [1,2,3]
+      end
+      @notimplemented "not implemented yet"
+  elseif face == 3
+      @notimplemented "not implemented yet"
+  end
+  return measures
 end
 
 function Arrays.return_cache(
