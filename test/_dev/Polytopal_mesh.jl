@@ -76,18 +76,25 @@ for n in 1:n_Dcells
       n_Dnodes = length(nbr_faces) + length(nbr_cells) + 1
   end
   Dcoords = view(Dnodes,Dnode_connectivity)
-  clockwise_perm = orient_nodes(Dcoords)
+  cc_perm = orient_nodes(Dcoords)
   ptrs[n+1] = ptrs[n] + n_Dnodes
-  data[ptrs[n]:ptrs[n+1]-1] .= Dnode_connectivity[clockwise_perm]
+  data[ptrs[n]:ptrs[n+1]-1] .= Dnode_connectivity[cc_perm]
 end
 
 Dc2n = Gridap.Arrays.Table(data,ptrs)
 
 Dcell_types = collect(1:n_Dcells)
-polytopes = map(Polygon,lazy_map(Broadcasting(Reindex(Dnodes)),Dc2n))
+poly = map(Polygon,lazy_map(Broadcasting(Reindex(Dnodes)),Dc2n))
 
-Dtopo = Geometry.UnstructuredGridTopology(Dnodes,Dc2n,Dcell_types,polytopes)
+Dtopo = Geometry.UnstructuredGridTopology(Dnodes,Dc2n,Dcell_types,poly)
 
 Dcell_map = Fill(identity,n_Dcells)
 
 
+
+# In the physical space
+
+# Facet measure
+face_coords = get_face_coordinates(Dtopo,2)
+
+get_face_coordinates(Poly)

@@ -8,22 +8,26 @@ using Gridap.Polynomials
 using Gridap.Helpers
 
 using FillArrays
+using LinearAlgebra
 
 
 p = TRI
-D = num_dims(p)
+dim = get_dimranges(p)[3]
+perm = [1,2,3]
+face_ents = get_face_coordinates(p)[dim]
+face_ents = map(Reindex(face_ents...),perm)
 
 # T = Float64
 T = VectorValue{D,Float64}
 
 
-cr_reffe = CRRefFE(T,p,1)
+# cr_reffe = CRRefFE(T,p,1)
 
-cr_dofs = get_dof_basis(cr_reffe)
-cr_prebasis  = get_prebasis(cr_reffe)
-cr_shapefuns = get_shapefuns(cr_reffe) 
+# cr_dofs = get_dof_basis(cr_reffe)
+# cr_prebasis  = get_prebasis(cr_reffe)
+# cr_shapefuns = get_shapefuns(cr_reffe) 
 
-M = evaluate(cr_dofs, cr_shapefuns)
+# M = evaluate(cr_dofs, cr_shapefuns)
 
 partition = (0,1,0,1)
 cells = (2,2)
@@ -40,7 +44,7 @@ face = 2
 
 
 
-function get_dfacet_measure(p::Polytope{2}, face::Int) 
+function get_facet_measure(p::Polytope{2}, face::Int) 
 
     measures = Float64[]
 
@@ -53,7 +57,10 @@ function get_dfacet_measure(p::Polytope{2}, face::Int)
     dim = get_dimranges(p)[face+1]
 
     if face == 0
-        push!(measures, 0.0)
+        face_ents = get_face_coordinates(p)[dim]
+        for entity in face_ents
+            push!(measures, 0.0)
+        end
     elseif face == 1
         face_ents = get_face_coordinates(p)[dim]
         for entity in face_ents
@@ -78,20 +85,17 @@ function get_dfacet_measure(p::Polytope{2}, face::Int)
     return measures
 end
 
-function get_dfacet_measure(p::Polytope{3}, face::Int) 
+function get_face_measure(p::Polytope{3}, face::Int) 
 
     measures = Float64[]
-
-    if p == HEX
-        perm = [1,2,4,3]
-    elseif p == TET
-        perm = [1,2,3]
-    end
 
     dim = get_dimranges(p)[face+1]
 
     if face == 0
-        push!(measures, 0.0)
+        face_ents = get_face_coordinates(p)[dim]
+        for entity in face_ents
+            push!(measures, 0.0)
+        end
     elseif face == 1
         face_ents = get_face_coordinates(p)[dim]
         for entity in face_ents
@@ -99,19 +103,14 @@ function get_dfacet_measure(p::Polytope{3}, face::Int)
             push!(measures, norm(p2-p1))
         end
     elseif face == 2
-        # # Shoelace / Gauss area algo
-        # face_ents = get_face_coordinates(p)[dim]
-        # face_ents = map(Reindex(face_ents...),perm)
-        # shift = circshift(face_ents, -1)
-    
-        # sum1 = map(face_ents, shift) do x1, x2
-        #     x1[1] * x2[2]  
-        # end
-        # sum2 = map(face_ents, shift) do x1, x2
-        #     x1[2] * x2[1]  
-        # end
-        # area = 0.5 * abs(sum(sum1)-sum(sum2))
-        # push!(measures, area)
+        if p == HEX 
+            perm = [1,2,4,3]
+        elseif p == TET
+            perm = [1,2,3]
+        end
+
+        @notimplemented "not implemented yet"
+
     elseif face == 3
         @notimplemented "not implemented yet"
     end
@@ -119,27 +118,27 @@ function get_dfacet_measure(p::Polytope{3}, face::Int)
 end
 
 # p = TET
-# dim = get_dimranges(p)[face+1]
+# dim = get_dimranges(p)[2+1]
 # face_ents = get_face_coordinates(p)[dim]
-
-# face_ents = map(face_ents) do f
-#     map(Reindex(f),perm)
+# # perm = [1,2,4,3]
+# perm = [1,2,3]
+# face_ents = map(face_ents) do x
+#     map(Reindex(x),perm)
 # end
 
-# shift = map(face_ents) do f
-#     circshift(f, -1)
-# end
-
-# sum1 = map(face_ents, shift) do face_ent, sh
-#     map(face_ent, sh) do x1, x2
-#         x1[1] * x2[2]  
+# area_vec = []
+# for i in 1:length(face_ents)
+#     push!(area_vec,[])
+#     for j in 1:length(face_ents[i])
+#        v1 = face_ents[i][j]
+#        v2 = face_ents[i][mod(j,length(face_ents[i]))+1]
+#        vec1 = v1 - face_ents[i][1]
+#        push!(area_vec[i],cross(v1,v2))
 #     end
 # end
 
-# sum2 = map(face_ents, shift) do face_ent, sh
-#     map(face_ent, sh) do x1, x2
-#         x1[2] * x2[1]  
-#     end
-# end
+# 0.5 * norm(sum(area_vec[2]))
 
-# facet_measure = get_dfacet_measure(p,1)
+# v1 = face_ents[1][1]
+# v2 = face_ents[1][2]
+# push!(area_vec,cross(v1,v2))
