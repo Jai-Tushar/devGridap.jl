@@ -61,4 +61,6 @@ include("Adaptivity/Adaptivity.jl")
 
 include("Exports.jl")
 
+include("Extensions/Extensions.jl")
+
 end # module

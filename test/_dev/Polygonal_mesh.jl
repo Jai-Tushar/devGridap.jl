@@ -17,11 +17,11 @@ end
 
 D = 2
 partition = (0,1,0,1)
-cells = (2,2)
+cells = (4,4)
 
 # primal (Simplicial mesh)
 
-model = simplexify(CartesianDiscreteModel(partition, cells))
+model = Gridap.Geometry.simplexify(CartesianDiscreteModel(partition, cells))
 
 pgrid = get_grid(model)
 ptopo = get_grid_topology(model)
@@ -35,8 +35,8 @@ pc2n = get_faces(ptopo,D,0)
 pe2n = get_faces(ptopo,D-1,0)
 pnodes = get_vertex_coordinates(ptopo)
 
-is_pbnode = Geometry.get_isboundary_face(ptopo,0)
-is_pbface = Geometry.get_isboundary_face(ptopo,D-1)
+is_pbnode = Gridap.Geometry.get_isboundary_face(ptopo,0)
+is_pbface = Gridap.Geometry.get_isboundary_face(ptopo,D-1)
 
 pbnodes = findall(is_pbnode)
 pbfaces = findall(is_pbface)
@@ -84,17 +84,23 @@ end
 Dc2n = Gridap.Arrays.Table(data,ptrs)
 
 Dcell_types = collect(1:n_Dcells)
-poly = map(Polygon,lazy_map(Broadcasting(Reindex(Dnodes)),Dc2n))
+poly = map(Gridap.ReferenceFEs.Polygon,lazy_map(Broadcasting(Reindex(Dnodes)),Dc2n))
 
-Dtopo = Geometry.UnstructuredGridTopology(Dnodes,Dc2n,Dcell_types,poly)
+Dtopo = Gridap.Geometry.UnstructuredGridTopology(Dnodes,Dc2n,Dcell_types,poly)
 
 Dcell_map = Fill(identity,n_Dcells)
 
 
+# Visualisation
 
-# In the physical space
+# How to include PolyMeshPlotExt.jl in Gridap.jl?
+# so that we can use  plot_polymesh(Dc2n, Dnodes)
+# instead of the following
 
-# Facet measure
-face_coords = get_face_coordinates(Dtopo,2)
+using Meshes, MeshViz
+import CairoMakie as Mke
 
-get_face_coordinates(Poly)
+elem = connect.(map(Tuple,Dc2n))
+verts = map(v -> Point2(v...), Dnodes)
+Polymesh = SimpleMesh(verts, elem) 
+viz(Polymesh, showfacets=true)

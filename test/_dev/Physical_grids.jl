@@ -12,7 +12,7 @@ using FillArrays
 
 grid = CartesianGrid((0,1,0,1), (2,2))
 
-@enter _grid =  UnstructuredGrid(grid)
+_grid =  UnstructuredGrid(grid)
 
 # collect1d(get_node_coordinates(grid))
 
@@ -133,7 +133,7 @@ end
 # function VoronoiDiscreteModel(desc::VoronoiDescriptor{D,T,F})
 #   grid  = PhysicalGrid(desc)
 
-# Orientation ?
+
 struct PhysicalGrid{Dc,Dp,Tp,O,Tn} <: Grid{Dc,Dp} 
   node_coordinates::Vector{Point{Dp,Tp}}
   cell_node_ids::Table{Int64, Vector{Int64}, Vector{Int64}}
