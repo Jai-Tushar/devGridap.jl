@@ -1,3 +1,7 @@
+"""
+
+$(public_names_in_md(@__MODULE__))
+"""
 module Fields
 
 using Gridap.Arrays
@@ -6,6 +10,7 @@ import Gridap.Arrays: inverse_map
 import Gridap.Arrays: get_children
 import Gridap.Arrays: testitem
 
+using Gridap.Helpers
 using Gridap.Helpers: @abstractmethod, @notimplemented
 using Gridap.Helpers: @notimplementedif, @unreachable, @check
 using Gridap.Helpers: tfill
@@ -56,7 +61,7 @@ export MockFieldArray
 export Point
 export inverse_map
 
-export AffineMap
+export AffineField
 export affine_map
 
 export gradient

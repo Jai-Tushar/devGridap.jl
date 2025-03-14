@@ -1,6 +1,8 @@
-struct BDM <: DivConforming end
+struct BDM <: PushforwardRefFE end
 
 const bdm = BDM()
+
+Pushforward(::Type{<:BDM}) = ContraVariantPiolaMap()
 
 """
 BDMRefFE(::Type{et},p::Polytope,order::Integer) where et
@@ -13,9 +15,9 @@ function BDMRefFE(::Type{T},p::Polytope,order::Integer) where T
   D = num_dims(p)
 
   if is_simplex(p)
-    prebasis = MonomialBasis{D}(VectorValue{D,T},order,Polynomials._p_filter)
-    fb = MonomialBasis{D-1}(T,order,Polynomials._p_filter)
-    cb = Polynomials.NedelecPrebasisOnSimplex{D}(order-2)
+    prebasis = MonomialBasis(Val(D),VectorValue{D,T},order,Polynomials._p_filter)
+    fb = MonomialBasis(Val(D-1),T,order,Polynomials._p_filter)
+    cb = PGradBasis(Monomial,Val(D),T,order-2)
   else
     @notimplemented "BDM Reference FE only available for simplices"
   end

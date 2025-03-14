@@ -1,5 +1,7 @@
 """
   Mesh Adaptivity for Gridap
+
+$(public_names_in_md(@__MODULE__))
 """
 module Adaptivity
 
@@ -40,10 +42,11 @@ export AdaptedTriangulation
 export Triangulation, is_change_possible, best_target, get_adapted_model
 export change_domain, move_contributions
 
+export DorflerMarking, mark, estimate
+
 include("RefinementRules.jl")
 include("FineToCoarseFields.jl")
 include("OldToNewFields.jl")
-include("FineToCoarseReferenceFEs.jl")
 include("AdaptivityGlues.jl")
 include("AdaptedDiscreteModels.jl")
 include("AdaptedTriangulations.jl")
@@ -51,5 +54,6 @@ include("MacroFEs.jl")
 include("CompositeQuadratures.jl")
 include("EdgeBasedRefinement.jl")
 include("SimplexifyRefinement.jl")
+include("AdaptiveMeshRefinement.jl")
 
 end # module

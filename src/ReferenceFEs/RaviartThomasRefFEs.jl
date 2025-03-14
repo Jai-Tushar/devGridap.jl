@@ -1,11 +1,12 @@
 
 struct DivConformity <: Conformity end
-abstract type DivConforming <: ReferenceFEName end
 
 # RaviartThomas
 
-struct RaviartThomas <: DivConforming end
+struct RaviartThomas <: PushforwardRefFE end
 const raviart_thomas = RaviartThomas()
+
+Pushforward(::Type{<:RaviartThomas}) = ContraVariantPiolaMap()
 
 """
     RaviartThomasRefFE(::Type{et},p::Polytope,order::Integer) where et
@@ -18,13 +19,13 @@ function RaviartThomasRefFE(
 ) where {T,D}
 
   if is_n_cube(p)
-    prebasis = QCurlGradJacobiPolynomialBasis{D}(T,order)          # Prebasis
-    cb = QGradJacobiPolynomialBasis{D}(T,order-1)                  # Cell basis
-    fb = JacobiPolynomialBasis{D-1}(T,order,Polynomials._q_filter) # Face basis
+    prebasis = QCurlGradBasis(Legendre,Val(D),T,order)         # Prebasis
+    cb = QGradBasis(Legendre,Val(D),T,order-1)                 # Cell basis
+    fb = LegendreBasis(Val(D-1),T,order,Polynomials._q_filter) # Face basis
   elseif is_simplex(p)
-    prebasis = PCurlGradMonomialBasis{D}(T,order)                                 # Prebasis
-    cb = JacobiPolynomialBasis{D}(VectorValue{D,T},order-1,Polynomials._p_filter) # Cell basis
-    fb = JacobiPolynomialBasis{D-1}(T,order,Polynomials._p_filter)                # Face basis
+    prebasis = PCurlGradBasis(Monomial,Val(D),T,order)                        # Prebasis
+    cb = LegendreBasis(Val(D),VectorValue{D,T},order-1,Polynomials._p_filter) # Cell basis
+    fb = LegendreBasis(Val(D-1),T,order,Polynomials._p_filter)                # Face basis
   else
     @notimplemented "Raviart-Thomas Reference FE only available for cubes and simplices"
   end
@@ -76,71 +77,15 @@ function get_face_own_dofs(reffe::GenericRefFE{RaviartThomas}, conf::DivConformi
 end
 
 # TODO: Please remove me
-function JacobiBasis(::Type{T},p::Polytope,orders) where T
-  compute_jacobi_basis(T,p,orders)
+function legendreBasis(::Type{T},p::Polytope,orders) where T
+  compute_legendre_basis(T,p,orders)
 end
-function JacobiBasis(::Type{T},p::Polytope{D},order::Int) where {D,T}
+function legendreBasis(::Type{T},p::Polytope{D},order::Int) where {D,T}
   orders = tfill(order,Val{D}())
-  JacobiBasis(T,p,orders)
+  legendreBasis(T,p,orders)
 end
-function compute_jacobi_basis(::Type{T},p::ExtrusionPolytope{D},orders) where {D,T}
+function compute_legendre_basis(::Type{T},p::ExtrusionPolytope{D},orders) where {D,T}
   extrusion = Tuple(p.extrusion)
   terms = _monomial_terms(extrusion,orders)
-  JacobiPolynomialBasis{D}(T,orders,terms)
-end
-
-# ContraVariantPiolaMap
-
-struct ContraVariantPiolaMap <: Map end
-
-function evaluate!(
-  cache,
-  ::Broadcasting{typeof(∇)},
-  a::Fields.BroadcastOpFieldArray{ContraVariantPiolaMap}
-)
-  v, Jt, sign_flip = a.args
-  ∇v = Broadcasting(∇)(v)
-  k = ContraVariantPiolaMap()
-  Broadcasting(Operation(k))(∇v,Jt,sign_flip)
-end
-
-function lazy_map(
-  ::Broadcasting{typeof(gradient)},
-  a::LazyArray{<:Fill{Broadcasting{Operation{ContraVariantPiolaMap}}}}
-)
-  v, Jt, sign_flip = a.args
-  ∇v = lazy_map(Broadcasting(∇),v)
-  k = ContraVariantPiolaMap()
-  lazy_map(Broadcasting(Operation(k)),∇v,Jt,sign_flip)
-end
-
-function lazy_map(
-  k::ContraVariantPiolaMap,
-  cell_ref_shapefuns::AbstractArray{<:AbstractArray{<:Field}},
-  cell_map::AbstractArray{<:Field},
-  sign_flip::AbstractArray{<:AbstractArray{<:Field}}
-)
-  cell_Jt = lazy_map(∇,cell_map)
-  lazy_map(Broadcasting(Operation(k)),cell_ref_shapefuns,cell_Jt,sign_flip)
-end
-
-function evaluate!(
-  cache,::ContraVariantPiolaMap,
-  v::Number,
-  Jt::Number,
-  sign_flip::Bool
-)
-  idetJ = 1/meas(Jt)
-  ((-1)^sign_flip*v)⋅(idetJ*Jt)
-end
-
-function evaluate!(
-  cache,
-  k::ContraVariantPiolaMap,
-  v::AbstractVector{<:Field},
-  phi::Field,
-  sign_flip::AbstractVector{<:Field}
-)
-  Jt = ∇(phi)
-  Broadcasting(Operation(k))(v,Jt,sign_flip)
+  LegendreBasis(Val(D),T,orders,terms)
 end

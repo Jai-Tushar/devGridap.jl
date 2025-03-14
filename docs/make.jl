@@ -23,13 +23,16 @@ pages = [
   "Gridap.Adaptivity" => "Adaptivity.md",
   "Developper notes" => Any[
     "dev-notes/block-assemblers.md",
+    "dev-notes/pullbacks.md",
+    "dev-notes/autodiff.md",
   ],
 ]
 
 makedocs(
   sitename = "Gridap.jl",
   format = Documenter.HTML(
-    size_threshold=nothing
+    size_threshold=nothing,
+    size_threshold_warn=300 * 2^10 # 300KiB
   ),
   modules = [Gridap],
   pages = pages,

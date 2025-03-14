@@ -9,7 +9,6 @@ using Test
   include("CartesianRefinementTests.jl")
   include("ComplexChangeDomainTests.jl")
   include("EdgeBasedRefinementTests.jl")
-  include("FineToCoarseFieldsTests.jl")
   include("RefinementRuleBoundaryTests.jl")
   include("MultifieldRefinementTests.jl")
 end
@@ -21,6 +20,10 @@ end
 @testset "MacroFETests" begin
   include("MacroFETests.jl")
   include("MacroFEStokesTests.jl")
+end
+
+@testset "AMR" begin
+  include("AdaptiveMeshRefinementTests.jl")
 end
 
 end # module

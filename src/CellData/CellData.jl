@@ -1,7 +1,6 @@
 """
 
-The exported names are
-$(EXPORTS)
+$(public_names_in_md(@__MODULE__))
 """
 module CellData
 
@@ -61,6 +60,7 @@ export Integrand
 export ∫
 export CellDof
 export get_normal_vector
+export get_tangent_vector
 export get_cell_measure
 export Interpolable
 export KDTreeSearch
@@ -86,7 +86,7 @@ export update_state!
 
 export DiracDelta
 
-export SkeletonCellFieldPair 
+export SkeletonCellFieldPair
 
 include("CellDataInterface.jl")
 

@@ -1,7 +1,6 @@
 """
 
-The exported names are
-$(EXPORTS)
+$(public_names_in_md(@__MODULE__))
 """
 module MultiField
 
@@ -26,7 +25,6 @@ using SparseMatricesCSR: SparseMatrixCSR
 
 import Gridap.Fields: gradient, DIV, ∇∇
 
-using ForwardDiff
 using FillArrays
 using SparseArrays
 using LinearAlgebra
@@ -48,8 +46,8 @@ include("MultiFieldFESpaces.jl")
 
 include("MultiFieldFEFunctions.jl")
 
-include("MultiFieldFEAutodiff.jl")
-
 include("BlockSparseMatrixAssemblers.jl")
+
+include("MultiFieldAutodiff.jl")
 
 end # module

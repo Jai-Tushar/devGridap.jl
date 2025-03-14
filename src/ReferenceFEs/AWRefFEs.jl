@@ -1,9 +1,11 @@
-struct ArnoldWinther <: ReferenceFEName end
+
+struct ArnoldWinther <: PushforwardRefFE end
 
 const arnoldwinther = ArnoldWinther()
 
 """
-ArnoldWintherRefFE(::Type{T},p::Polytope,order::Integer) where T
+    struct ArnoldWinther <: PushforwardRefFE end
+    ArnoldWintherRefFE(::Type{T},p::Polytope,order::Integer) where T
 
 Arnold-Winther reference finite element.
 
@@ -17,10 +19,10 @@ References:
 function ArnoldWintherRefFE(::Type{T},p::Polytope,order::Integer) where T
   @assert p == TRI "ArnoldWinther Reference FE only defined for TRIangles"
   conforming = true # TODO: Make this an argument
-  
+
   VT = SymTensorValue{2,T}
-  prebasis = MonomialBasis{2}(VT,3,Polynomials._p_filter)
-  fb = MonomialBasis{D-1}(T,0,Polynomials._p_filter)
+  prebasis = MonomialBasis(Val(2),VT,3,Polynomials._p_filter)
+  fb = MonomialBasis(Val(D-1),T,0,Polynomials._p_filter)
   cb = map(constant_field,component_basis(VT))
 
   function cmom(φ,μ,ds) # Cell and Node moment function: σ_K(φ,μ) = ∫(φ:μ)dK
@@ -55,11 +57,11 @@ function ArnoldWintherRefFE(::Type{T},p::Polytope,order::Integer) where T
 end
 
 function ReferenceFE(p::Polytope,::ArnoldWinther, order)
-  BDMRefFE(Float64,p,order)
+  ArnoldWintherRefFE(Float64,p,order)
 end
 
 function ReferenceFE(p::Polytope,::ArnoldWinther,::Type{T}, order) where T
-  BDMRefFE(T,p,order)
+  ArnoldWintherRefFE(T,p,order)
 end
 
 function Conformity(reffe::GenericRefFE{ArnoldWinther},sym::Symbol)
