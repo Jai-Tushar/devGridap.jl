@@ -1,7 +1,7 @@
 name = "Gridap"
 uuid = "56d4f2e9-7ea1-5844-9cf6-b9c51ca7ce8e"
 authors = ["Santiago Badia <santiago.badia@monash.edu>", "Francesc Verdugo <f.verdugo.rojano@vu.nl>", "Alberto F. Martin <alberto.f.martin@anu.edu.au>"]
-version = "0.18.10"
+version = "0.18.12"
 
 [deps]
 AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
@@ -43,7 +43,7 @@ DocStringExtensions = "0.8.1, 0.9"
 FastGaussQuadrature = "0.4.5, 1"
 FileIO = "1.5"
 FillArrays = "1.11"
-ForwardDiff = "0.10.14"
+ForwardDiff = "0.10.14, 1"
 JLD2 = "0.5"
 JSON = "0.21"
 LineSearches = "7.0.1"

@@ -5,7 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.18.12] - 2025-04-19
+
+### Added
+
+- Added functionality to allow automatic differentiation of integrals with respect to evaluation positions xh where xh is a FEFunction. Since PR[#1095](https://github.com/gridap/Gridap.jl/pull/1095)
+
+### Fixed
+
+- Fix bug for issue [#927](https://github.com/gridap/Gridap.jl/issues/927), where Nedelec FE would not work on faces (Dc < Dp). Since PR[#1094](https://github.com/gridap/Gridap.jl/pull/1094).
+- Added support to evaluate polynomial bases on dualized points. Since PR[#1100](https://github.com/gridap/Gridap.jl/pull/1100).
+
+## [0.18.11] - 2025-04-01
 
 ### Added
 
@@ -21,7 +32,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-
+- Modified the `LinearStageOperator` struct to align it with the `NonlinearStageOperator`. Added `usx`, `ws` and `tx` as new fields in the struct. Since PR[#1089](https://github.com/gridap/Gridap.jl/pull/1089).
+- Misc `TensorValues` improvements since PR [#1092](https://github.com/gridap/Gridap.jl/pull/1092).
+    - `MultiValue`s can now be indexed by tuples of mixed `Integer` and `CartesianIndex`
+    - Indexing in `MultiValue`s now performs bound checks, that can be disabled using `@inbounds` or Gridap's performance execution mode.
+    - Make sure that the result of all operation (empty/zero tensor) of correctly promoted (element) type when applied to tensor(s) of length zero
+    - An argument error is now thrown when calling `tr(::ThirdOrderTensorValue{A,B})` with `A!=B`
 
 ## [0.18.10] - 2025-03-04
 
